@@ -8,17 +8,26 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.speech.tts.TextToSpeech;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -132,6 +141,9 @@ public class MainActivity extends AppCompatActivity {
             txtInMsg.setText(rs[0]+"\r\n"+txtInMsg.getText());
             FuncVoiceOrderCheck(rs[0]);
             mRecognizer.startListening(SttIntent);
+
+            BackgroundTask task = new BackgroundTask();
+            task.execute(rs[0]);
         }
 
         @Override
@@ -185,6 +197,57 @@ public class MainActivity extends AppCompatActivity {
             mRecognizer.destroy();
             mRecognizer.cancel();
             mRecognizer=null;
+        }
+    }
+    class BackgroundTask extends AsyncTask<String,Void,String> {
+        @Override
+        protected String doInBackground(String... str) {
+            String inputTest = str[0];
+            String clientId = "378gjuK8BlJffNWUF0p3";
+            String clientSecret = "UIG7F_Uib2";
+            String result = "";
+            try {
+                String text = URLEncoder.encode(inputTest, "UTF-8");
+                String apiURL = "https://openapi.naver.com/v1/papago/n2mt";
+                URL url = new URL(apiURL);
+                HttpURLConnection con = (HttpURLConnection) url.openConnection();
+                con.setRequestMethod("POST");
+                con.setRequestProperty("X-Naver-Client-Id", clientId);
+                con.setRequestProperty("X-Naver-Client-Secret", clientSecret);
+
+                String postParams = "source=ko&target=en&text=" + text;
+                con.setDoOutput(true);
+                DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+                wr.writeBytes(postParams);
+                wr.flush();
+                wr.close();
+
+                int responseCode = con.getResponseCode();
+                BufferedReader br;
+                if (responseCode == 200) {
+                    br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                } else {
+                    br = new BufferedReader(new InputStreamReader(con.getErrorStream()));
+                }
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+                while ((inputLine = br.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                br.close();
+                result = response.toString();
+            } catch (Exception e) {
+                result = "실패";
+                System.out.println(e);
+            }
+            return result;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            String tmp = s.split("\"")[27];
+            Toast.makeText(getApplicationContext(), tmp, Toast.LENGTH_LONG).show();
         }
     }
 }
