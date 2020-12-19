@@ -17,7 +17,6 @@ import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -33,7 +32,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
@@ -52,14 +50,9 @@ public class MainActivity extends AppCompatActivity {
     Button btnSttStart;
     EditText txtInMsg;
     EditText txtSystem;
+    String language;
+    TextView lan_text;
 
-    // Dropdown box용
-    String[] items_from = {"한국어", "English"};
-    String[] items_to = {"한국어", "English"};
-    String[] items_font = {"폰트1", "폰트2", "폰트3"};
-    String[] items_fontsize = {"10", "12", "14"};
-    String[] items_fontcolor = {"검정색", "하얀색"};
-    String[] items_background = {"검정색", "회색", "하얀색"};
 
 
     @Override
@@ -68,56 +61,39 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Spinner spinner_from = findViewById(R.id.from_spinner);
-        Spinner spinner_to = findViewById(R.id.to_spinner);
-        Spinner spinner_font = findViewById(R.id.font_spinner);
-        Spinner spinner_fontsize = findViewById(R.id.font_size_spinner);
-        Spinner spinner_fontcolor = findViewById(R.id.font_color_spinner);
-        Spinner spinner_background = findViewById(R.id.background_color_spinner);
+        Intent intent = new Intent(this.getIntent());
+        lan_text = findViewById(R.id.lan_text);
+        language = intent.getStringExtra("language");
+        lan_text.setText(language);
+        Log.d("taggg", language);
 
-        ArrayAdapter<String> from_adapter = new ArrayAdapter<String>(
-                getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, items_from
-        );
-        ArrayAdapter<String> to_adapter = new ArrayAdapter<String>(
-                getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, items_to
-        );
-        ArrayAdapter<String> font_adapter = new ArrayAdapter<String>(
-                getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, items_font
-        );
-        ArrayAdapter<String> fontsize_adapter = new ArrayAdapter<String>(
-                getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, items_fontsize
-        );
-        ArrayAdapter<String> fontcolor_adapter = new ArrayAdapter<String>(
-                getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, items_fontcolor
-        );
-        ArrayAdapter<String> background_adapter = new ArrayAdapter<String>(
-                getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, items_background
-        );
-
-        spinner_from.setAdapter(from_adapter);
-        spinner_to.setAdapter(to_adapter);
-        spinner_font.setAdapter(font_adapter);
-        spinner_fontsize.setAdapter(fontsize_adapter);
-        spinner_fontcolor.setAdapter(fontcolor_adapter);
-        spinner_background.setAdapter(background_adapter);
-
-        spinner_fontsize.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        /*
+        // 언어 변환을 위한 스피너
+        Spinner spinner = (Spinner)findViewById(R.id.from_spinner);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                int changed_fontsize = Integer.parseInt(items_fontsize[i]);
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                //Log.d("tag", (String) parent.getItemAtPosition(position));
+                //language = (String) parent.getItemAtPosition(position);
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
+            public void onNothingSelected(AdapterView<?> parent) {
             }
-        });
+    });
 
+         */
 
         // 음성인식
         SttIntent=new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         SttIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, getApplicationContext().getPackageName());
-        SttIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "ko-KR"); // 한국어 사용
+        Log.d("tagggg", language);
+        if (language.equals("Korean to English")) {
+            SttIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "ko-KR"); // 한국어 사용
+        }
+        else {
+            SttIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-US"); // 영어 사용
+        }
         mRecognizer=SpeechRecognizer.createSpeechRecognizer(cThis);
         mRecognizer.setRecognitionListener(listener);
 
@@ -126,7 +102,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onInit(int status) {
                 if(status != TextToSpeech.ERROR){
-                    tts.setLanguage(Locale.KOREAN);
+                    if (language.equals("Korean to English")) {
+                        tts.setLanguage(Locale.KOREAN);
+                    }
+                    else {
+                        tts.setLanguage(Locale.ENGLISH);
+                    }
                 }
             }
         });
@@ -150,6 +131,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
 
         txtInMsg=(EditText)findViewById(R.id.txtInMsg);
         txtSystem=(EditText)findViewById(R.id.txtSystem);
@@ -260,6 +242,7 @@ public class MainActivity extends AppCompatActivity {
             mRecognizer=null;
         }
     }
+
     class BackgroundTask extends AsyncTask<String,Void,String> {
         @Override
         protected String doInBackground(String... str) {
@@ -275,8 +258,15 @@ public class MainActivity extends AppCompatActivity {
                 con.setRequestMethod("POST");
                 con.setRequestProperty("X-Naver-Client-Id", clientId);
                 con.setRequestProperty("X-Naver-Client-Secret", clientSecret);
+                String postParams;
 
-                String postParams = "source=ko&target=en&text=" + text;
+                if (language.equals("Korean to English")) {
+                    postParams = "source=ko&target=en&text=" + text;
+                }
+                else {
+                    postParams = "source=en&target=ko&text=" + text;
+                }
+
                 con.setDoOutput(true);
                 DataOutputStream wr = new DataOutputStream(con.getOutputStream());
                 wr.writeBytes(postParams);
