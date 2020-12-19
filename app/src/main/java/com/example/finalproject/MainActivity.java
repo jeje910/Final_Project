@@ -8,13 +8,20 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.speech.tts.TextToSpeech;
+import android.telephony.SmsManager;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -53,13 +60,21 @@ public class MainActivity extends AppCompatActivity {
     EditText txtInMsg;
     EditText txtSystem;
 
-    // Dropdown box용
+    // Dropdown box 입력용
     String[] items_from = {"한국어", "English"};
-    String[] items_to = {"한국어", "English"};
+    String[] items_to = {"English", "한국어"};
     String[] items_font = {"폰트1", "폰트2", "폰트3"};
     String[] items_fontsize = {"10", "12", "14"};
-    String[] items_fontcolor = {"검정색", "하얀색"};
-    String[] items_background = {"검정색", "회색", "하얀색"};
+    String[] items_fontcolor = {"하얀색", "검정색"};
+    String[] items_background = {"기본", "검정색", "하얀색"};
+
+    // Dropdown box 출력용
+    String changed_font;
+    int changed_fontsize;
+    String changed_fontcolor;
+    String changed_background;
+
+
 
 
     @Override
@@ -104,7 +119,29 @@ public class MainActivity extends AppCompatActivity {
         spinner_fontsize.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                int changed_fontsize = Integer.parseInt(items_fontsize[i]);
+                changed_fontsize = Integer.parseInt(items_fontsize[i]);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+        spinner_fontcolor.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                changed_fontcolor = items_fontcolor[i];
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+        spinner_background.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                changed_background = items_background[i];
             }
 
             @Override
@@ -165,11 +202,11 @@ public class MainActivity extends AppCompatActivity {
     private RecognitionListener listener = new RecognitionListener() {
         @Override
         public void onReadyForSpeech(Bundle bundle) {
-            txtSystem.setText("onReadyForSpeech"+ "\r\n"+txtSystem.getText());
+            txtSystem.setText("Ready..");
         }
         @Override
         public void onBeginningOfSpeech() {
-            txtSystem.setText("지금부터 말을 해주세요"+"\r\n"+txtSystem.getText());
+            txtSystem.setText("지금부터 말을 해주세요");
         }
 
         @Override
@@ -179,12 +216,12 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onBufferReceived(byte[] bytes) {
-            txtSystem.setText("onBufferReceived"+"\r\n"+txtSystem.getText());
+            txtSystem.setText("onBufferReceived");
         }
 
         @Override
         public void onEndOfSpeech() {
-            txtSystem.setText("onEndOfSpeech"+"\r\n"+txtSystem.getText());
+            txtSystem.setText("대화가 종료되었습니다. 다시하려면 버튼을 클릭해주세요");
         }
 
         @Override
@@ -199,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
             ArrayList<String> mResult =results.getStringArrayList(key);
             String[] rs = new String[mResult.size()];
             mResult.toArray(rs);
-            txtInMsg.setText(rs[0]+"\r\n"+txtInMsg.getText());
+            txtInMsg.setText(rs[0]+"\r\n");
             FuncVoiceOrderCheck(rs[0]);
             mRecognizer.startListening(SttIntent);
 
@@ -209,12 +246,12 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onPartialResults(Bundle bundle) {
-            txtSystem.setText("onPartialResults"+"\r\n"+txtSystem.getText());
+            txtSystem.setText("onPartialResults");
         }
 
         @Override
         public void onEvent(int i, Bundle bundle) {
-            txtSystem.setText("onEvent"+"\r\n"+txtSystem.getText());
+            txtSystem.setText("onEvent");
         }
     };
 
@@ -223,6 +260,7 @@ public class MainActivity extends AppCompatActivity {
         if(VoiceMsg.length()<1)return;
 
         VoiceMsg=VoiceMsg.replace(" ","");//공백제거
+
 
         if(VoiceMsg.indexOf("카카오톡")>-1 || VoiceMsg.indexOf("카톡")>-1){
             Intent launchIntent = getPackageManager().getLaunchIntentForPackage("com.kakao.talk");
@@ -242,10 +280,8 @@ public class MainActivity extends AppCompatActivity {
         tts.setSpeechRate(1.0f);//목소리 속도
         tts.speak(OutMsg,TextToSpeech.QUEUE_FLUSH,null);
 
-        //어플이 종료할때는 완전히 제거
-
     }
-    //카톡으로 이동을 했는데 음성인식 어플이 종료되지 않아 계속 실행되는 경우를 막기위해 어플 종료 함수
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -260,6 +296,7 @@ public class MainActivity extends AppCompatActivity {
             mRecognizer=null;
         }
     }
+
     class BackgroundTask extends AsyncTask<String,Void,String> {
         @Override
         protected String doInBackground(String... str) {
@@ -308,7 +345,33 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             String tmp = s.split("\"")[27];
-            Toast.makeText(getApplicationContext(), tmp, Toast.LENGTH_LONG).show();
+            SpannableStringBuilder translated_text = new SpannableStringBuilder(tmp);
+
+            if(changed_fontsize==12){
+                translated_text.setSpan(new RelativeSizeSpan(1.15f), 0, tmp.length(), 0);
+            }
+            else if(changed_fontsize==14){
+                translated_text.setSpan(new RelativeSizeSpan(1.3f), 0, tmp.length(), 0);
+            }
+
+            if(changed_fontcolor=="검정색"){
+                translated_text.setSpan(new ForegroundColorSpan(Color.BLACK), 0, tmp.length(), 0);
+            }
+
+            Toast toast = Toast.makeText(getApplicationContext(), translated_text, Toast.LENGTH_LONG);
+
+            if(changed_background=="검정색"){
+                View view = toast.getView();
+                view.setBackgroundColor(Color.BLACK);
+                toast.setView(view);
+            }
+            else if(changed_background=="하얀색"){
+                View view = toast.getView();
+                view.setBackgroundColor(Color.WHITE);
+                toast.setView(view);
+            }
+            toast.show();
+
         }
     }
 }

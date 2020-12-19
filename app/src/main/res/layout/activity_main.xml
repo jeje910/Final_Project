@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
@@ -21,6 +22,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="100dp"
         />
+
     <TextView
         android:id="@+id/from"
         android:text="@string/from"
@@ -42,6 +44,109 @@
         android:textColor="#000000"
         />
 
+    <TextView
+        android:id="@+id/to"
+        android:text="@string/to"
+        android:layout_width="150dp"
+        android:layout_height="30dp"
+        android:layout_below="@+id/from"
+        android:layout_toLeftOf="@+id/center"
+        android:gravity="center_horizontal|center_vertical"
+        android:textColor="#000000"
+        android:background="@drawable/edge"
+        />
+    <Spinner
+        android:id="@+id/to_spinner"
+        android:layout_width="150dp"
+        android:layout_height="30dp"
+        android:layout_below="@+id/from"
+        android:layout_toRightOf="@+id/center"
+        android:gravity="center_vertical"
+        android:textColor="#000000"
+        />
+    <TextView
+        android:id="@+id/font"
+        android:text="@string/font"
+        android:layout_width="150dp"
+        android:layout_height="30dp"
+        android:layout_below="@+id/to"
+        android:layout_toLeftOf="@+id/center"
+        android:gravity="center_horizontal|center_vertical"
+        android:textColor="#000000"
+        android:background="@drawable/edge"
+        />
+    <Spinner
+        android:id="@+id/font_spinner"
+        android:layout_width="150dp"
+        android:layout_height="30dp"
+        android:layout_below="@+id/to"
+        android:layout_toRightOf="@+id/center"
+        android:gravity="center_vertical"
+        android:textColor="#000000"
+        />
+    <TextView
+        android:id="@+id/font_size"
+        android:text="@string/font_size"
+        android:layout_width="150dp"
+        android:layout_height="30dp"
+        android:layout_below="@+id/font"
+        android:layout_toLeftOf="@+id/center"
+        android:gravity="center_horizontal|center_vertical"
+        android:textColor="#000000"
+        android:background="@drawable/edge"
+        />
+    <Spinner
+        android:id="@+id/font_size_spinner"
+        android:layout_width="150dp"
+        android:layout_height="30dp"
+        android:layout_below="@+id/font"
+        android:layout_toRightOf="@+id/center"
+        android:gravity="center_vertical"
+        android:textColor="#000000"
+        />
+
+    <TextView
+        android:id="@+id/font_color"
+        android:text="@string/font_color"
+        android:layout_width="150dp"
+        android:layout_height="30dp"
+        android:layout_below="@+id/font_size"
+        android:layout_toLeftOf="@+id/center"
+        android:gravity="center_horizontal|center_vertical"
+        android:textColor="#000000"
+        android:background="@drawable/edge"
+        />
+    <Spinner
+        android:id="@+id/font_color_spinner"
+        android:layout_width="150dp"
+        android:layout_height="30dp"
+        android:layout_below="@+id/font_size"
+        android:layout_toRightOf="@+id/center"
+        android:gravity="center_vertical"
+        android:textColor="#000000"
+        />
+
+    <TextView
+        android:id="@+id/background_color"
+        android:text="@string/background_color"
+        android:layout_width="150dp"
+        android:layout_height="30dp"
+        android:layout_below="@+id/font_color"
+        android:layout_toLeftOf="@+id/center"
+        android:gravity="center_horizontal|center_vertical"
+        android:textColor="#000000"
+        android:background="@drawable/edge"
+        />
+    <Spinner
+        android:id="@+id/background_color_spinner"
+        android:layout_width="150dp"
+        android:layout_height="30dp"
+        android:layout_below="@+id/font_color"
+        android:layout_toRightOf="@+id/center"
+        android:gravity="center_vertical"
+        android:textColor="#000000"
+        />
+
     <Button
         android:id="@+id/btn_stt_start"
         android:layout_width="wrap_content"
@@ -57,6 +162,7 @@
         android:layout_below="@+id/btn_stt_start"
         android:ems="10"
         android:inputType="textPersonName"
+        android:gravity="center_horizontal|center_vertical"
         android:background="#808080"
         />
 
@@ -65,6 +171,7 @@
         android:layout_width="match_parent"
         android:layout_height="112dp"
         android:layout_below="@id/txtSystem"
+        android:gravity="center_horizontal|center_vertical"
         android:ems="10"
         android:inputType="textPersonName" />
 
