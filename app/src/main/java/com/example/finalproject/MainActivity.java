@@ -90,8 +90,7 @@ public class MainActivity extends AppCompatActivity {
         lan_text.setText(language);
         Log.d("taggg", language);
 
-        Spinner spinner_from = findViewById(R.id.from_spinner);
-        Spinner spinner_to = findViewById(R.id.to_spinner);
+
         Spinner spinner_font = findViewById(R.id.font_spinner);
         Spinner spinner_fontsize = findViewById(R.id.font_size_spinner);
         Spinner spinner_fontcolor = findViewById(R.id.font_color_spinner);
@@ -116,8 +115,6 @@ public class MainActivity extends AppCompatActivity {
                 getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, items_background
         );
 
-        spinner_from.setAdapter(from_adapter);
-        spinner_to.setAdapter(to_adapter);
         spinner_font.setAdapter(font_adapter);
         spinner_fontsize.setAdapter(fontsize_adapter);
         spinner_fontcolor.setAdapter(fontcolor_adapter);
@@ -156,8 +153,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
-         */
 
         // 음성인식
         SttIntent=new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
