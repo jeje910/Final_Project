@@ -120,6 +120,17 @@ public class MainActivity extends AppCompatActivity {
         spinner_fontcolor.setAdapter(fontcolor_adapter);
         spinner_background.setAdapter(background_adapter);
 
+        spinner_font.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                changed_font = items_font[i];
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
         spinner_fontsize.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
