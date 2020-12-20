@@ -7,4 +7,15 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+
+    <!-- Toast Style -->
+    <style name="toastTextStyle1" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">@font/nanumbrush</item>
+    </style>
+    <style name="toastTextStyle2" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">@font/nanumbarungothic</item>
+    </style>
+    <style name="toastTextStyle3" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">@font/nanumpen</item>
+    </style>
 </resources>
