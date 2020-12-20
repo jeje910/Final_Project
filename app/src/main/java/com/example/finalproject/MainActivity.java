@@ -381,15 +381,22 @@ public class MainActivity extends AppCompatActivity {
 
             Toast toast = Toast.makeText(getApplicationContext(), translated_text, Toast.LENGTH_LONG);
 
+            View view = toast.getView();
             if(changed_background=="검정색"){
-                View view = toast.getView();
                 view.setBackgroundColor(Color.BLACK);
                 toast.setView(view);
             }
             else if(changed_background=="하얀색"){
-                View view = toast.getView();
                 view.setBackgroundColor(Color.WHITE);
                 toast.setView(view);
+            }
+
+            TextView text = (TextView) view.findViewById(android.R.id.message);
+            if(changed_font=="폰트2"){
+                text.setTextAppearance(R.style.toastTextStyle2);
+            }
+            else if(changed_font=="폰트3"){
+                text.setTextAppearance(R.style.toastTextStyle3);
             }
             toast.show();
 
